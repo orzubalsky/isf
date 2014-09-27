@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}{{ block.super|title }} : {{ event.name|title }}{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}openlayers/css/ol.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}events/css/events.css" />
+<style>
+header {
+    border-top-color: {{ event.color }};
+    border-left-color: {{ event.color }};
+    border-right-color: {{ event.color }};    
+    background-color: {{ event.color }};
+    color: white;
+}
+.inverse header {
+    background-color: white;
+    color: {{ event.color }};
+}
+.navbar,
+section.success {
+    background-color: {{ event.color }};
+}
+.btn-primary {
+    background-color: {{ event.color }};
+    color: white;
+    border: 1px solid white;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: white;
+    color: {{ event.color }};
+    border: 1px solid {{ event.color }};
+}
+p, a, h2 {
+    color: {{ event.color }};
+}
+section.success h2 {
+    color: white;
+}
+.alert-danger,
+.alert-success {
+    background-color: {{ event.color }};
+    border-color: white;
+}{}
+</style>
+{% endblock extra_css %}
+
+
+{% block body_class %}
+{% if event.do_color_inverse %}inverse{% endif %}    
+{% endblock body_class %}
+
+{% block navigation_links %}                        
+<li class="hidden">
+    <a href="#page-top"></a>
+</li>
+<li class="page-scroll">
+    <a href="#content-1">What</a>
+</li>
+<li class="page-scroll">
+    <a href="#content-2">Where</a>
+</li>
+{% if event.do_get_guests %}
+<li class="page-scroll">
+    <a href="#content-3">Join</a>
+</li>    
+{% endif %}
+{% if event.do_show_guests and event.guest_set.all.count > 0 %}
+<li class="page-scroll">
+    <a href="#content-4">Participants</a>
+</li>    
+{% endif %}
+{% if event.do_show_proposals and proposals.count > 0 %}
+<li class="page-scroll">
+    <a href="#content-5">Proposals</a>
+</li>    
+{% endif %}
+
+{% endblock navigation_links %}
+
+{% block header_content %}
+<div class="intro-text">
+    <span class="name">{{ event.title|title }}</span>
+    <span class="skills">{{ event.start_date|date:"l M j, Y"}}</span>
+</div>    
+{% endblock header_content %}
+
+
+{% block content %}
+<section id="content-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-left description">
+                {{ event.description|safe }}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="content-2">
+    <div class="container">
+        <div class="row">
+            <h3 class="col-lg-12 text-center">
+                {{ event.street_address }} {{ event.city }}, {{ event.state }} {{ event.zip_code }}<br />
+                {{ event.start_date|date:"l M j, Y" }}<br />
+                {{ event.start_date|date:"fA" }} - {{ event.end_date|date:"fA" }}
+            </h3>
+        </div>    
+    </div>
+</section>
+<div id="map"></div>
+
+{% if event.do_get_guests %}
+<section id="content-3" class="success">
+    <div class="container">
+        <div class="take_action">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>RSVP</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <form name="sentMessage" id="signForm" method="post" action="{{ request.path }}" novalidate>
+                    {% csrf_token %}
+                    {% bootstrap_form_errors person_form type='non_fields' %}
+                    {% bootstrap_form_errors guest_form type='non_fields' %}
+                 
+                    <div class="row control-group">
+                        <div class="floating-label-form-group controls">
+                            {% bootstrap_field person_form.name %}
+                            <p class="help-block text-danger"></p>
+                        </div>
+                    </div>
+                    <div class="row control-group">
+                        <div class="floating-label-form-group controls">
+                            {% bootstrap_field person_form.email %}
+                            <p class="help-block text-danger"></p>                        
+                        </div>
+                    </div>
+                    <div class="row control-group">
+                        <div class="floating-label-form-group controls">
+                            {% bootstrap_field guest_form.affiliation %}
+                            <p class="help-block text-danger"></p>                        
+                        </div>
+                    </div>                                
+                    <div class="row control-group">
+                        <div class="floating-label-form-group controls">
+                            {% bootstrap_field guest_form.proposal %}
+                            <p class="help-block text-danger"></p>                        
+                        </div>
+                    </div>                
+                    <div id="success"></div>
+
+                    <div class="row control-group">
+                        <div class="floating-label-form-group controls">
+                            {% buttons submit='JOIN' %}{% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif%}
+
+{% if event.do_show_guests and event.guest_set.all.count > 0 %}
+<section id="content-4">
+    <div class="container">
+        <div class="people">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Participants</h2>
+                </div>
+            </div>
+            <div class="row list">
+            {% for guest in event.guest_set.all %}
+                <p class="guest col-lg-3 col-lg-offset-1">
+                    {{ guest.person.name|title }} 
+                    {% if guest.affiliation %}
+                    <span class="affiliation">({{ guest.affiliation }})</span>
+                    {% endif %}
+                </p>
+            {% endfor %}  
+            {% for guest in facebook_attendees %}
+                {% if guest.name not in guest_names %}
+                    <p class="guest col-lg-3 col-lg-offset-1">
+                        {{ guest.name|title }}
+                    </p>
+                {% endif %}
+            {% endfor %}              
+            </div>      
+        </div>  
+    </div>
+</section>
+{% endif %}
+
+
+{% if event.do_show_proposals and proposals.count > 0 %}
+<section id="content-5">
+    <div class="container">
+        <div class="proposals">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Proposals</h2>
+                </div>
+            </div>
+            <div class="row list">
+            {% for guest in proposals %}
+                    <p class="proposal col-lg-5 col-lg-offset-1">
+                        {{ guest.proposal }}
+                    </p>
+            {% endfor %}  
+            </div>      
+        </div>  
+    </div>
+</section>
+{% endif %}
+{% endblock content %}
+
+
+{% block footer_links %}
+{% for related_event in event.related_events.all  %}
+<li>
+    <a href="{% url 'event-detail' slug=related_event.slug %}" class="">
+        {{ related_event.title|title }}
+    </a>
+</li>        
+{% endfor %}
+{% for related_letter in event.related_letters.all  %}
+<li>
+    <a href="{% url 'letter-detail' slug=related_letter.slug %}" class="">
+        {{ related_letter.title|title }}
+    </a>
+</li>        
+{% endfor %}                             
+{% endblock footer_links %}
+
+
+{% block extra_js %}
+    
+<script type="text/javascript">
+    var url = '{{ request.path }}';
+</script>
+<!-- Contact Form JavaScript -->
+<script src="{{ STATIC_URL }}freelancer/js/jqBootstrapValidation.js"></script>
+<script src="{{ STATIC_URL }}isf/js/guest_form.js"></script>
+<script src="{{ STATIC_URL }}openlayers/js/ol.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}openlayers/js/stamen.js" type="text/javascript"></script>
+<script type="text/javascript">
+var lng = {{ event.longitude }};
+var lat = {{ event.latitude }};
+
+var vectorSource = new ol.source.Vector({
+      //create empty vector
+});
+
+var iconFeature = new ol.Feature(
+{
+    geometry: new ol.geom.Point(
+        ol.proj.transform([lat, lng], 'EPSG:4326', 'EPSG:3857')
+    )
+});
+
+vectorSource.addFeature(iconFeature);
+
+//create the style
+var iconStyle = new ol.style.Style(
+{
+    image: new ol.style.Circle(
+    {
+        radius: 20,
+        fill: new ol.style.Fill(
+        {
+            color: '{{ event.color }}'
+        }),
+    })
+});
+
+//add the feature vector to the layer vector, and apply a style to whole layer
+var vectorLayer = new ol.layer.Vector(
+{
+    source: vectorSource,
+    style: iconStyle
+});
+
+var map = new ol.Map(
+{
+    projection: 'EPSG:3857',
+    layers: 
+    [
+        new ol.layer.Tile(
+        {
+            source: new ol.source.Stamen(
+            {
+                layer: 'toner'
+            })
+        }),
+        vectorLayer        
+    ],
+    target: 'map',
+    view: new ol.View(
+    {
+        center: ol.proj.transform
+        (
+            [lat, lng], 'EPSG:4326', 'EPSG:3857'
+        ),
+        zoom: 17
+    }),
+    controls: [],
+    interactions: ol.interaction.defaults(
+    {
+        altShiftDragRotate:false,
+        pinchRotate:false,
+        mouseWheelZoom:false,
+    })
+});
+
+</script>
+{% endblock extra_js %}

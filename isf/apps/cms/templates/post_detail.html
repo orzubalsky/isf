@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super|title }} ⊿ {{ post.name|title }}{% endblock title %}
+
+{% block content %}
+
+<div id="news" class="list col_2">
+    {% block post %}
+    <div class="post_list">
+        <p class="date">{{ post.created|date:"M j, Y"}}</p>
+        <h3><strong>{{ post.name|title }}</strong></h3>
+        {% if post.source_link %}<br /><a href="{{ post.source_link }}" target="_blank" class="source_link">{{ post.source_link }}</a>{% endif %}
+        <div class="content">
+            {% if post.videos or post.vimeos or post.images %}
+            <div class="gallery">
+                {% for video in post.videos.all %}
+                    {{ video.media }}
+                {% endfor %}
+                {% for vimeo in post.vimeos.all %}
+                    <div class="item">{{ vimeo.media|safe }}</div>
+                {% endfor %}
+                {% for image in post.images.all %}
+                    <div class="item"><img src="{{ image.media.url }}" alt="{{ post.name }} : {{ image.media.name }}" /></div>
+                {% endfor %}
+                {% if post.gallery_items_count > 1 %}
+                <div class="controls">
+                    {% url 'post-detail' slug=post.slug as post_url %}                
+                    <a class="back" href="{{ post_url }}">back</a>
+                    <a class="next" href="{{ post_url }}">next</a>
+                </div>
+                {% endif %}            
+            </div>
+            {% endif %}            
+            <div class="clear">&nbsp;</div>
+            {{ post.content|safe }}
+        </div>
+    </div>
+    {% endblock post %}
+</div>
+{% endblock content %}

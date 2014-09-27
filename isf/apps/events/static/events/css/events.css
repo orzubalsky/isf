@@ -1,0 +1,12 @@
+#map {
+	height: 400px;
+	width: 100%;
+}
+.proposal {
+	border-width: 1px;
+	border-style: solid;
+	border-color: transparent;
+}
+.affiliation {
+	color: #e7e7e7;
+}

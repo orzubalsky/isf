@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} : events{% endblock title %}
+
+{% block content %}
+<div class="list">
+    {% for event in event_list %}
+
+        <div class="detail">
+            <p class="date">
+                {{ event.date_of_event|date:"M j, Y"}}
+            </p>
+            <h3>
+                <a class="more" href="{% url 'event-detail' slug=event.slug %}">
+                    <strong>{{ event.title|title }}</strong>       
+                </a>
+            </h3>
+        </li>        
+    {% endfor %}
+</div>
+{% endblock content %}

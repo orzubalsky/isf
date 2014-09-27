@@ -1,0 +1,22 @@
+body {
+    background: #ffffff;
+    color: #666666;
+    font-family: georgia, serif;
+    font-size: 16px;
+    line-height: 1;
+}
+strong {
+    font-weight: bold;
+}
+.description p {
+	font-size: 20px;
+	line-height: 1.7;
+	margin: 0 auto 40px;
+	width: 70%;
+}
+.with-navbar-fixed-top {
+    padding-top: 30px;
+}
+.take_action h2 {
+    margin: 0 0 20px 0;
+}

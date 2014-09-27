@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} : letters{% endblock title %}
+
+{% block content %}
+<div class="list" id="letters">
+    
+    {% for letter in letter_list %}
+        <div class="detail">
+            <p class="date">
+                {{ letter.date_published|date:"M j, Y"}}
+            </p>
+            <h3>
+                <a class="more" href="{% url 'letter-detail' slug=letter.slug %}">
+                    <strong>{{ letter.title|title }}</strong>       
+                </a>
+            </h3>
+        </div>        
+    {% endfor %}
+</div>
+{% endblock content %}

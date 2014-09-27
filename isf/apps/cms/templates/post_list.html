@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} ⊿ news{% endblock title %}
+
+{% block content %}
+<ul id="news" class="list col_2">
+    {% for post in post_list %}
+        {% block post %}
+        <li class="post_list">
+            <p class="date">{{ post.created|date:"M j, Y"}}</p>
+            <h3><strong>{{ post.name|title }}</strong></h3>
+            {% if post.source_link %}<br /><a href="{{ post.source_link }}" target="_blank" class="source_link">{{ post.source_link }}</a>{% endif %}
+            <div class="content">
+                {{ post.content|safe|truncatewords_html:30 }}
+                {% if post.content|length > 200 %}
+                <a class="read_more" href="{% url 'post-detail' slug=post.slug %}">read more</a>
+                {% endif %}
+            </div>
+        </li>
+        {% endblock post %}
+    {% endfor %}
+</ul>
+{% endblock content %}

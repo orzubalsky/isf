@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+
+{% block title %}{{ block.super|title }} : {{ letter.name|title }}{% endblock title %}
+
+{% block extra_css %}
+<style>
+header {
+    border-top-color: {{ letter.color }};
+    border-left-color: {{ letter.color }};
+    border-right-color: {{ letter.color }};    
+    background-color: {{ letter.color }};
+    color: white;
+}
+.inverse header {
+    background-color: white;
+    color: {{ letter.color }};
+}
+.navbar,
+section.success {
+    background-color: {{ letter.color }};
+}
+.btn-primary {
+    background-color: {{ letter.color }};
+    color: white;
+    border: 1px solid white;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: white;
+    color: {{ letter.color }};
+    border: 1px solid {{ letter.color }};
+}
+p, a, h2 {
+    color: {{ letter.color }};
+}
+section.success h2 {
+    color: white;
+}
+.alert-danger,
+.alert-success {
+    background-color: {{ letter.color }};
+    border-color: white;
+}{}
+</style>
+{% endblock extra_css %}
+
+{% block body_class %}
+{% if letter.do_color_inverse %}inverse{% endif %}    
+{% endblock body_class %}
+
+{% block navigation_links %}                        
+<li class="hidden">
+    <a href="#page-top"></a>
+</li>
+{% if letter.do_get_signatures or letter.do_show_signatures %}
+<li class="page-scroll">
+    <a href="#content-1">Letter</a>
+</li>
+{% endif %}
+{% if letter.do_get_signatures %}
+<li class="page-scroll">
+    <a href="#content-2">Sign</a>
+</li>
+{% endif %}
+{% if letter.do_show_signatures and letter.signatures.all.count > 0 %}
+<li class="page-scroll">
+    <a href="#content-3">Signatures</a>
+</li>
+{% endif %}
+{% endblock navigation_links %}
+
+{% block header_content %}
+<div class="intro-text">
+    <span class="name">{{ letter.title|title }}</span>
+    <span class="skills">{{ letter.date_published|date:"M j, Y"}}</span>
+</div>    
+{% endblock header_content %}
+
+
+{% block content %}
+
+<section id="content-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-left description">
+                {{ letter.body|safe }}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if letter.do_get_signatures %}
+<section id="content-2" class="success">
+    <div class="container">
+        <div class="take_action">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Add Your Signature</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <form name="sentMessage" id="signForm" method="post" action="{{ request.path }}" novalidate>
+                        {% csrf_token %}
+                        {% bootstrap_form_errors person_form type='non_fields' %}
+                        {% bootstrap_form_errors signature_form type='non_fields' %}
+                     
+                        <div class="row control-group">
+                            <div class="floating-label-form-group controls">
+                                {% bootstrap_field person_form.name %}
+                                <p class="help-block text-danger"></p>
+                            </div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="floating-label-form-group controls">
+                                {% bootstrap_field person_form.email %}
+                                <p class="help-block text-danger"></p>                        
+                            </div>
+                        </div>
+                        <div class="row control-group">
+                            <div class="floating-label-form-group controls">
+                                {% bootstrap_field signature_form.comment %}
+                                <p class="help-block text-danger"></p>                        
+                            </div>
+                        </div>                                
+
+                        <div id="success"></div>
+
+                        <div class="row control-group">
+                            <div class="floating-label-form-group controls">
+                                {% buttons submit='SIGN' %}{% endbuttons %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if letter.do_show_signatures and letter.signatures.all.count > 0 %}
+<section id="content-3">
+    <div class="container">
+        <div class="people">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>Signatures</h2>
+                </div>
+            </div>
+            <div class="row list">
+            {% for signature in letter.signatures.all %}
+                <p class="person col-lg-3 col-lg-offset-1">
+                    {{ signature.name|title }}
+                </p>
+            {% endfor %}  
+            </div>      
+        </div>  
+    </div>
+</section>
+{% endif %}
+{% endblock content %}
+
+{% block footer_links %}
+{% for related_event in letter.related_events.all  %}
+<li>
+    <a href="{% url 'event-detail' slug=related_event.slug %}" class="">
+        {{ related_event.title|title }}
+    </a>
+</li>        
+{% endfor %}
+{% for related_letter in letter.related_letters.all  %}
+<li>
+    <a href="{% url 'letter-detail' slug=related_letter.slug %}" class="">
+        {{ related_letter.title|title }}
+    </a>
+</li>        
+{% endfor %}                             
+{% endblock footer_links %}
+
+
+{% block extra_js %}
+    
+<script type="text/javascript">
+    var url = '{{ request.path }}';
+</script>
+<!-- Contact Form JavaScript -->
+<script src="{{ STATIC_URL }}freelancer/js/jqBootstrapValidation.js"></script>
+<script src="{{ STATIC_URL }}isf/js/signature_form.js"></script>
+
+{% endblock extra_js %}
