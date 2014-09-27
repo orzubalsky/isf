@@ -2,6 +2,9 @@
 	height: 400px;
 	width: 100%;
 }
+.proposals {
+	line-height: 1.7;
+}
 .proposal {
 	border-width: 1px;
 	border-style: solid;
