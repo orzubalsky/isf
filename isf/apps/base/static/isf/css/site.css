@@ -8,7 +8,9 @@ body {
 strong {
     font-weight: bold;
 }
-.description p {
+.description p,
+.description ol,
+.description ul {
 	font-size: 20px;
 	line-height: 1.7;
 	margin: 0 auto 40px;

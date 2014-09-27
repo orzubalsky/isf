@@ -385,7 +385,9 @@ form .row:first-child .floating-label-form-group {
 footer {
     color: #fff;
 }
-footer a {
+footer a,
+footer ol,
+footer ul {
     color: #fff;
 }
 footer a:hover,
