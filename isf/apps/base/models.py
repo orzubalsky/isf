@@ -36,6 +36,7 @@ class Person(Base):
     """
     class Meta:
         verbose_name_plural = "People"
+        ordering = ['name', ]
 
     name = CharField(max_length=140)
     email = EmailField()

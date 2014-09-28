@@ -21,7 +21,7 @@ class Letter(Base):
         null=True
     )
     related_letters = ManyToManyField("self", blank=True, null=True)
-    related_events = ManyToManyField("events.Event", blank=True, null=True)    
+    related_events = ManyToManyField("events.Event", blank=True, null=True)
     color = CharField(max_length=22, default='#000000')
     do_color_inverse = BooleanField(default=True)
     do_get_signatures = BooleanField(default=False)

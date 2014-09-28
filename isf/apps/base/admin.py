@@ -10,12 +10,24 @@ class BaseAdmin(admin.ModelAdmin):
     pass
 
 
+class PersonInline(admin.TabularInline):
+    """
+    """
+    model = Person
+    fields = (
+        'name',
+        'email',
+        'is_active'
+    )
+    extra = 0
+
+
 class PersonAdmin(BaseAdmin, ImportExportModelAdmin):
     resource_class = PersonResource
-    pass
+    fields = ('name', 'email')
+    list_display = ('name', 'email', 'created', 'is_active')
+    list_editable = ('is_active', 'email')
 
 
 # register admin models
 admin.site.register(Person, PersonAdmin)
-# admin.site.register(Video)
-# admin.site.register(Vimeo)
