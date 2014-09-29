@@ -25,7 +25,7 @@ class EventList(ListView):
 def home(request):
     """
     """
-    event = Event.objects.all()[0]
+    event = Event.objects.get(pk=1)
 
     return HttpResponseRedirect(reverse_lazy(
         event_detail,
