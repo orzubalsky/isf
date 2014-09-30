@@ -2,7 +2,7 @@
 
 {% load bootstrap3 %}
 
-{% block title %}{{ block.super|title }} : {{ event.name|title }}{% endblock title %}
+{% block title %}{{ block.super|title }} : {{ event.title|title }}{% endblock title %}
 
 {% block extra_css %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}openlayers/css/ol.css">
